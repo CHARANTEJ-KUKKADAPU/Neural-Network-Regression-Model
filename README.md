@@ -10,7 +10,7 @@ Explain the problem statement
 
 ## Neural Network Model
 
-<img width="954" height="633" alt="image" src="https://github.com/user-attachments/assets/1baf6a15-d9a5-4ee8-88c3-e280cdbf3dd9" />
+<img width="1919" height="1012" alt="image" src="https://github.com/user-attachments/assets/bacc8538-5b0b-476a-b49c-63aaac61491f" />
 
 ## DESIGN STEPS
 
@@ -46,42 +46,69 @@ Evaluate the model with the testing data.
 ### Name: KUKKADAPU CHARAN TEJ
 ### Register Number: 212224040167
 ```python
-class Neuralnet(nn.Module):
-   def __init__(self):
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+
+class NeuralNet(nn.Module):
+    def __init__(self):
         super().__init__()
-        self.n1=nn.Linear(1,10)
-        self.n2=nn.Linear(10,20)
-        self.n3=nn.Linear(20,1)
-        self.relu=nn.ReLU()
-        self.history={'loss': []}
-   def forward(self,x):
-        x=self.relu(self.n1(x))
-        x=self.relu(self.n2(x))
-        x=self.n3(x)
+        self.n1 = nn.Linear(1,10)
+        self.n2 = nn.Linear(10,20)
+        self.n3 = nn.Linear(20,1)
+        self.relu = nn.ReLU()
+        self.history = {'loss': []}
+
+    def forward(self,x):
+        x = self.relu(self.n1(x))
+        x = self.relu(self.n2(x))
+        x = self.n3(x)
         return x
 
-
 # Initialize the Model, Loss Function, and Optimizer
-nithi=NeuralNet()
-criterion = nn.MSELoss()
-optimizer = optim.RMSprop(nithi.parameters(),lr=0.001)
 
-def train_model(nithi, X_train, y_train, criterion, optimizer, epochs=1000):
-    # initialize history before loop
-    nithi.history = {'loss': []}
+model = NeuralNet()
+
+criterion = nn.MSELoss()
+
+optimizer = optim.RMSprop(model.parameters(), lr=0.001)
+## Create Training Data
+
+X_train = torch.linspace(-5,5,100).view(-1,1)
+y_train = X_train**2
+
+## Training Function
+def train_model(model, X_train, y_train, criterion, optimizer, epochs=1000):
+    model.history = {'loss': []}
 
     for epoch in range(epochs):
         optimizer.zero_grad()
-        outputs = nithi(X_train)
+
+        outputs = model(X_train)
+
         loss = criterion(outputs, y_train)
+
         loss.backward()
+
         optimizer.step()
 
-        # record loss
-        nithi.history['loss'].append(loss.item())
+        model.history['loss'].append(loss.item())
 
         if epoch % 200 == 0:
             print(f'Epoch [{epoch}/{epochs}], Loss: {loss.item():.6f}')
+## run training
+train_model(model, X_train, y_train, criterion, optimizer)
+
+## Plot Training Loss
+import matplotlib.pyplot as plt
+
+plt.plot(model.history['loss'])
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.title("Training Loss")
+plt.show()
 
 
 ```
@@ -91,20 +118,26 @@ def train_model(nithi, X_train, y_train, criterion, optimizer, epochs=1000):
 
 ## OUTPUT
 
-<img width="480" height="125" alt="image" src="https://github.com/user-attachments/assets/f557f51e-0a10-469e-aa66-ec9d0b01f693" />
+<img width="483" height="126" alt="image" src="https://github.com/user-attachments/assets/52bfbe89-6f0c-41c9-b7e5-060956da38b7" />
 
 
 ### Training Loss Vs Iteration Plot
 
-<img width="1011" height="615" alt="image" src="https://github.com/user-attachments/assets/5ab07ea3-4cdc-4867-aa98-46af5c9ab5c4" />
+<img width="571" height="455" alt="image" src="https://github.com/user-attachments/assets/e2a2e045-b76d-4f62-9558-8b3b2675d1c3" />
 
 ### New Sample Data Prediction
-```
+```py 
 X_n1_1 = torch.tensor([[9]], dtype=torch.float32)
-prediction = nithi(torch.tensor(scaler.transform(X_n1_1), dtype=torch.float32)).item()
+
+prediction = model(
+    torch.tensor(scaler.transform(X_n1_1), dtype=torch.float32)
+).item()
+
 print(f'Prediction: {prediction}')
 ```
-<img width="912" height="52" alt="image" src="https://github.com/user-attachments/assets/81d835e9-7edc-47d3-9dc6-42958eaa3fc8" />
+
+
+<img width="729" height="244" alt="image" src="https://github.com/user-attachments/assets/64f0281a-1b90-4b2c-8f73-961eb805c9c0" />
 
 ## RESULT
 
